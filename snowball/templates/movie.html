@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Stream</title>
+
+    <style>
+        /* Background Gradient */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(45deg, #3D2B68, #1D1D3B, #3D2B68, #1D1D3B);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            color: #fff;
+            /* Text color */
+        }
+
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Page Container */
+        .page-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* justify-content: center; */
+            text-align: center;
+            position: relative;
+            /* Add position relative */
+        }
+
+        /* Heading Style */
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        /* Input and Button Styles */
+        label {
+            font-size: 18px;
+            margin-right: 10px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #8e55eb;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #007db3;
+        }
+
+        /* Result and Movie Styles */
+        #testing {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+
+        #movie_id h1 {
+            font-size: 24px;
+        }
+
+        /* If not right - check link */
+        #check {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        /* iframe Container */
+        .iframe-container {
+            width: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .iframe-wrapper {
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 56.25%; /* 16:9 aspect ratio (9 / 16 * 100%) */
+            position: relative;
+        }
+
+        .iframe-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page-container">
+        <h1>Movie Streaming</h1>
+
+        <label for="movie_name">Enter something:</label>
+        <input type="text" id="movie_name" name="movie_name" onchange="testing()">
+        <button id="enter_button" onclick="testing()">Search</button>
+
+        <div id="testing"></div>
+
+        <div id="movie_id"></div>
+
+
+    </div>
+
+    <div class="iframe-container">
+        <div class="iframe-wrapper" id="thebox">
+            
+        </div>
+    </div>
+
+    <div id="check"></div>
+
+    <script>
+        async function testing() {
+            //enter = submit
+            const Enter = document.getElementById("movie_name");
+            Enter.addEventListener("keypress", function (event) {
+                if (event.key === "Enter") {
+                    document.getElementById("enter_button").click();
+                }
+            });
+
+            //displaying the movie name
+            const name = document.getElementById("movie_name").value;
+            const testing = document.getElementById("testing");
+            testing.innerHTML = `<h3>${name}</h3>`;
+
+            //sending name to python and recieving the movie id
+            const res = document.getElementById("movie_id");
+            const response = await fetch(`/movienameid?name=${name}`);
+            const movie = await response.json();
+            res.innerHTML = `<h1>${movie.title}</h1>`
+
+            const thebox = document.getElementById("thebox");
+            thebox.innerHTML = `<iframe src="https://vidsrc.to/embed/movie/tt${movie.id}" style="width:100%; height:100%;" allowfullscreen></iframe>`
+
+            const check = document.getElementById("check");
+            check.innerHTML = `if not right - click <a href="https://www.imdb.com/find/?q=${name}" target=_blank>check</a>`
+        }
+    </script>
+
+</body>
+
+</html>
